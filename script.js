@@ -10,10 +10,6 @@ const managerEl = document.getElementById('managerEl');
 const searchInput = document.getElementById('searchInput');
 const tabsEl = document.getElementById('tabsEl');
 const entriesEl = document.getElementById('entriesEl');
-const rawWrap = document.getElementById('rawWrap');
-const output = document.getElementById('output');
-const copyBtn = document.getElementById('copyBtn');
-const copyBtnLabel = document.getElementById('copyBtnLabel');
 const clearBtn = document.getElementById('clearBtn');
 
 let allEntries = [];
@@ -23,17 +19,17 @@ let clipboardEpoch = 0;
 const MASK = '•••••••••••';
 
 const ICONS = {
-  copy: '<rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>',
-  check: '<polyline points="20 6 9 17 4 12"></polyline>',
-  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>',
-  eyeOff: '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>',
-  unlock: '<rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path>',
-  spinner: '<circle cx="12" cy="12" r="10" opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path>'
+  copy: '<rect x="9" y="9" width="13" height="13" rx="2"><\/rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"><\/path>',
+  check: '<polyline points="20 6 9 17 4 12"><\/polyline>',
+  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"><\/path><circle cx="12" cy="12" r="3"><\/circle>',
+  eyeOff: '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"><\/path><path d="M14.12 14.12L9.88 9.88"><\/path>',
+  unlock: '<rect x="3" y="11" width="18" height="11" rx="2"><\/rect><path d="M7 11V7a5 5 0 0 1 9.9-1"><\/path>',
+  spinner: '<circle cx="12" cy="12" r="10" opacity="0.25"><\/circle><path d="M12 2a10 10 0 0 1 10 10"><\/path>'
 };
 function getIcon(name, size, cls){
   size = size || 16;
   const classAttr = cls ? 'icon ' + cls : 'icon';
-  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="' + classAttr + '">' + (ICONS[name] || '') + '</svg>';
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="' + classAttr + '">' + ICONS[name] + '<\/svg>';
 }
 
 function reanimate(el){
@@ -257,7 +253,7 @@ async function decryptFile(){
   if(!password){ showStatus('Please enter a password.', 'error'); return; }
 
   decryptBtn.disabled = true;
-  decryptBtn.innerHTML = getIcon('spinner', 16, 'spin') + '<span>Decrypting…</span>';
+  decryptBtn.innerHTML = getIcon('spinner', 16, 'spin') + '<span>Decrypting…<\/span>';
   showStatus('Decrypting…', 'ok');
 
   try{
@@ -308,18 +304,13 @@ async function decryptFile(){
       searchInput.value = '';
       managerEl.style.display = 'block';
       fallbackNote.style.display = 'none';
-      rawWrap.style.display = 'none';
       renderCategoryTabs();
       renderEntries();
     }else{
       allEntries = [];
       managerEl.style.display = 'none';
-      output.textContent = parsed ? JSON.stringify(parsed, null, 2) : text;
-      rawWrap.style.display = 'block';
       fallbackNote.style.display = 'block';
-      fallbackNote.textContent = parsed
-        ? 'No top-level "entries" array found, so this is shown as raw JSON. See "JSON structure this tool expects" below to enable the categorized view.'
-        : 'Decrypted content is not valid JSON, so it is shown as raw text below.';
+      fallbackNote.textContent = 'The decrypted content does not have the expected "entries" array format. Please ensure your encrypted file contains a properly formatted JSON structure with an "entries" array.';
     }
 
     vaultPlaceholder.style.display = 'none';
@@ -332,29 +323,17 @@ async function decryptFile(){
     showStatus('Decryption failed: wrong password, wrong settings, or corrupted file.', 'error');
   }finally{
     decryptBtn.disabled = false;
-    decryptBtn.innerHTML = getIcon('unlock', 16) + '<span>Decrypt &amp; View</span>';
+    decryptBtn.innerHTML = getIcon('unlock', 16) + '<span>Decrypt &amp; View<\/span>';
   }
 }
 
 decryptBtn.addEventListener('click', decryptFile);
 
-copyBtn.addEventListener('click', async () => {
-  const ok = await copyText(output.textContent);
-  if(ok){
-    copyBtnLabel.textContent = 'Copied';
-    setTimeout(() => { copyBtnLabel.textContent = 'Copy JSON'; }, 1200);
-  }else{
-    showStatus('Copy failed — select the text above and copy manually.', 'error');
-  }
-});
-
 clearBtn.addEventListener('click', () => {
   allEntries = [];
   entriesEl.innerHTML = '';
   tabsEl.innerHTML = '';
-  output.textContent = '';
   managerEl.style.display = 'none';
-  rawWrap.style.display = 'none';
   fallbackNote.style.display = 'none';
   resultPanel.style.display = 'none';
   vaultPlaceholder.style.display = 'block';

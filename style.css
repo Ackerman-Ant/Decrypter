@@ -134,20 +134,6 @@
   .status.error{display:block;background:rgba(201,99,106,0.1);color:var(--danger);border:1px solid rgba(201,99,106,0.3);animation:fadeInUp 200ms ease-out both;}
   .status.ok{display:block;background:rgba(79,156,120,0.1);color:var(--ok);border:1px solid rgba(79,156,120,0.3);animation:fadeInUp 200ms ease-out both;}
 
-  pre{
-    background:var(--panel-alt);
-    border:1px solid var(--border);
-    border-radius:6px;
-    padding:16px;
-    font-family:var(--mono);
-    font-size:13px;
-    overflow-x:auto;
-    white-space:pre-wrap;
-    word-break:break-word;
-    max-height:500px;
-    overflow-y:auto;
-    margin:0;
-  }
   .toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
   .toolbar button{width:auto;background:transparent;color:var(--muted);border:1px solid var(--border);padding:8px 12px;font-size:12px;}
   .toolbar button:hover{background:var(--panel-alt);color:var(--text);border-color:var(--border-strong);}
